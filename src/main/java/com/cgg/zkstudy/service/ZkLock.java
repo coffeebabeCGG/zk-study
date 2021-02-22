@@ -12,6 +12,12 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author cgg
+ *
+ * 使用zk 客户端 curator实现分布式锁
+ */
+
 @Component
 @Slf4j
 public class ZkLock {
@@ -24,7 +30,7 @@ public class ZkLock {
 
     private static final String lock_path = "/lock01";
 
-    @Scheduled(cron = "0/30 * * * * ?")
+//    @Scheduled(cron = "0/10 * * * * ?")
     private void updateUserStatus() {
         boolean flag = false;
         InterProcessMutex lock = new InterProcessMutex(curatorFramework, lock_path);
@@ -37,7 +43,7 @@ public class ZkLock {
                 for (ZkStudy zkStudy : list) {
                     timeWait();
                     if (Integer.valueOf(zkStudy.getStatus()) < 0) {
-                        break;
+                        continue;
                     }
                     int count = Integer.valueOf(zkStudy.getStatus());
                     zkStudy.setStatus(String.valueOf(count - 1));
